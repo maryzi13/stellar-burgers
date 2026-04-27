@@ -17,7 +17,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
   <header className={styles.header}>
     <nav className={`${styles.menu} p-4`}>
       <div className={styles.menu_part_left}>
-        <NavLink to='/' className={getLinkClassName}>
+        <NavLink to='/' className={getLinkClassName} end>
           {({ isActive }) => (
             <>
               <BurgerIcon type={isActive ? 'primary' : 'secondary'} />
@@ -38,7 +38,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
         </NavLink>
       </div>
 
-      <NavLink to='/' className={styles.logo}>
+      <NavLink to='/' className={styles.logo} end>
         <Logo className='' />
       </NavLink>
 
