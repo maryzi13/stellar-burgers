@@ -10,11 +10,14 @@ import {
   ProfileIcon
 } from '@zlden/react-developer-burger-ui-components';
 
+const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
+  `${styles.link} ${isActive ? styles.link_active : ''}`;
+
 export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
   <header className={styles.header}>
     <nav className={`${styles.menu} p-4`}>
       <div className={styles.menu_part_left}>
-        <NavLink to='/' className={styles.link}>
+        <NavLink to='/' className={getLinkClassName}>
           {({ isActive }) => (
             <>
               <BurgerIcon type={isActive ? 'primary' : 'secondary'} />
@@ -25,7 +28,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
           )}
         </NavLink>
 
-        <NavLink to='/feed' className={styles.link}>
+        <NavLink to='/feed' className={getLinkClassName}>
           {({ isActive }) => (
             <>
               <ListIcon type={isActive ? 'primary' : 'secondary'} />
@@ -40,7 +43,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
       </NavLink>
 
       <div className={styles.link_position_last}>
-        <NavLink to='/profile' className={styles.link}>
+        <NavLink to='/profile' className={getLinkClassName}>
           {({ isActive }) => (
             <>
               <ProfileIcon type={isActive ? 'primary' : 'secondary'} />

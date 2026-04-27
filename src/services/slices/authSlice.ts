@@ -9,7 +9,7 @@ import {
   resetPasswordApi
 } from '@api';
 import { TUser } from '@utils-types';
-import { setCookie } from '../../utils/cookie';
+import { setCookie, deleteCookie } from '../../utils/cookie';
 
 type TAuthState = {
   user: TUser | null;
@@ -27,19 +27,30 @@ const initialState: TAuthState = {
   error: null
 };
 
-export const checkUserAuth = createAsyncThunk('auth/checkUserAuth', async () =>
-  getUserApi()
-);
+export const checkUserAuth = createAsyncThunk('auth/checkUserAuth', getUserApi);
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async (data: { email: string; password: string }) => loginUserApi(data)
+  async (data: { email: string; password: string }) => {
+    const response = await loginUserApi(data);
+
+    localStorage.setItem('refreshToken', response.refreshToken);
+    setCookie('accessToken', response.accessToken);
+
+    return response;
+  }
 );
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async (data: { email: string; password: string; name: string }) =>
-    registerUserApi(data)
+  async (data: { email: string; password: string; name: string }) => {
+    const response = await registerUserApi(data);
+
+    localStorage.setItem('refreshToken', response.refreshToken);
+    setCookie('accessToken', response.accessToken);
+
+    return response;
+  }
 );
 
 export const updateUser = createAsyncThunk(
@@ -48,9 +59,14 @@ export const updateUser = createAsyncThunk(
     updateUserApi(data)
 );
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async () =>
-  logoutApi()
-);
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  const response = await logoutApi();
+
+  localStorage.removeItem('refreshToken');
+  deleteCookie('accessToken');
+
+  return response;
+});
 
 export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
@@ -83,6 +99,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
       })
+
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -92,9 +109,6 @@ const authSlice = createSlice({
         state.isAuthChecked = true;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
-        setCookie('accessToken', action.payload.accessToken);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -103,6 +117,7 @@ const authSlice = createSlice({
         state.user = null;
         state.error = action.error.message || 'Ошибка авторизации';
       })
+
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -112,29 +127,44 @@ const authSlice = createSlice({
         state.isAuthChecked = true;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
-        setCookie('accessToken', action.payload.accessToken);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
+        state.isAuthChecked = true;
         state.isAuthenticated = false;
+        state.user = null;
         state.error = action.error.message || 'Ошибка регистрации';
       })
+
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.user = action.payload.user;
         state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.error.message || 'Ошибка обновления профиля';
       })
+
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.isAuthChecked = true;
-        localStorage.removeItem('refreshToken');
-        document.cookie = 'accessToken=; Max-Age=0';
       })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Ошибка выхода из аккаунта';
+      })
+
       .addCase(forgotPassword.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -146,6 +176,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Ошибка восстановления пароля';
       })
+
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
         state.error = null;
