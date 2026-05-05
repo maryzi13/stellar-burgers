@@ -28,7 +28,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { fetchIngredients } from '@slices';
 import {
-  selectIngredients,
+  // selectIngredients,
   selectIngredientsLoading,
   selectIngredientsError
 } from '@selectors';
@@ -44,7 +44,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   const isIngredientsLoading = useSelector(selectIngredientsLoading);
-  const ingredients = useSelector(selectIngredients);
+  // const ingredients = useSelector(selectIngredients);
   const error = useSelector(selectIngredientsError);
 
   useEffect(() => {
@@ -67,15 +67,17 @@ const App = () => {
       );
     }
 
-    if (ingredients.length > 0) {
-      return <ConstructorPage />;
-    }
+    // if (ingredients.length > 0) {
+    //   return <ConstructorPage />;
+    // }
 
-    return (
-      <div className={`${styles.title} text text_type_main-medium pt-4`}>
-        Нет ингредиентов
-      </div>
-    );
+    // return (
+    //   <div className={`${styles.title} text text_type_main-medium pt-4`}>
+    //     Нет ингредиентов
+    //   </div>
+    // );
+
+    return <ConstructorPage />;
   };
 
   return (
