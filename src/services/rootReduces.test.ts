@@ -1,48 +1,25 @@
 import { rootReducer } from './store';
+import { ingredientsReducer } from './slices/ingredientsSlice';
+import { authReducer } from './slices/authSlice';
+import { constructorReducer } from './slices/constructorSlice';
+import { orderReducer } from './slices/orderSlice';
+import { feedReducer } from './slices/feedSlice';
+import { profileOrdersReducer } from './slices/profileOrdersSlice';
+import { orderDetailsReducer } from './slices/orderDetailsSlice';
 
 describe('rootReducer', () => {
   it('корректно инициализирует начальное состояние', () => {
-    const state = rootReducer(undefined, { type: 'UNKNOWN_ACTION' });
+    const action = { type: 'UNKNOWN_ACTION' };
+    const state = rootReducer(undefined, action);
 
     expect(state).toEqual({
-      ingredients: {
-        ingredients: [],
-        isLoading: false,
-        error: null
-      },
-      auth: {
-        user: null,
-        isAuthChecked: false,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null
-      },
-      burgerConstructor: {
-        bun: null,
-        ingredients: []
-      },
-      order: {
-        orderRequest: false,
-        orderModalData: null,
-        error: null
-      },
-      feed: {
-        orders: [],
-        total: 0,
-        totalToday: 0,
-        isLoading: false,
-        error: null
-      },
-      profileOrders: {
-        orders: [],
-        isLoading: false,
-        error: null
-      },
-      orderDetails: {
-        order: null,
-        isLoading: false,
-        error: null
-      }
+      ingredients: ingredientsReducer(undefined, action),
+      auth: authReducer(undefined, action),
+      burgerConstructor: constructorReducer(undefined, action),
+      order: orderReducer(undefined, action),
+      feed: feedReducer(undefined, action),
+      profileOrders: profileOrdersReducer(undefined, action),
+      orderDetails: orderDetailsReducer(undefined, action)
     });
   });
 });
